@@ -6,6 +6,8 @@ const { ApolloServer }= require('apollo-server-express')
 //import typeDefs and resolvers
 const { typeDefs, resolvers } = require('./schemas')
 
+const path = require('path')
+
 //import connection
 const db = require('./config/connection');
 
@@ -29,6 +31,19 @@ server.applyMiddleware({ app })
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+// Serve up static assets when in production
+// check to see if node enviornment is in production
+if (process.env.NODE_ENV === 'production') {
+  //if yes, tell express server to server any files in react's build directory
+  app.use(express.static(path.join(__dirname, '../client/build')));
+}
+
+// wildcard get route for the server
+// if we make a get request to any location on the server that doesn't have a route defined, respond with production ready React FE code
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
 
 //when we run server, we listen for connection with db.open
 db.once('open', () => {

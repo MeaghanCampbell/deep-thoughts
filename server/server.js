@@ -12,11 +12,15 @@ const db = require('./config/connection');
 const PORT = process.env.PORT || 3001;
 const app = express();
 
+const { authMiddleware } = require('./utils/auth')
+
 // create a new Apollo server and pass in our schema data
 // provide typeDefs and resolvers so they know what our API looks like and how it resolves requests
 const server = new ApolloServer({
   typeDefs,
-  resolvers
+  resolvers,
+  // pass context method that's set to return what you want avail to resolvers
+  context: authMiddleware
 })
 
 // integrate Apollo server with the Eexpress application as middleware

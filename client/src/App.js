@@ -21,6 +21,17 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 // establish new connection to the graphQL server using Apollo
 // React runs on 3000 and GraphQL runs on 3001
 const client = new ApolloClient({
+  // every time we make a request to the server, this code automatically sets up an HTTP request headers with our token
+  // this way our server can receive the request and check tokens validity
+  request: operation => {
+    const token = localStorage.getItem('id_token');
+    // set context sets http request headers of every reqest including the token
+    operation.setContext({
+      headers: {
+        authorization: token ? `Bearer ${token}` : ''
+      }
+    });
+  },
   uri: '/graphql'
 });
 
